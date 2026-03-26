@@ -23,6 +23,10 @@ public class Booking {
         this.hotelName = hotelName;
     }
 
+    public int getTotalPrice() {
+        return totalPrice;
+    }
+
     public UUID getBookingId() {
         return this.bookingId;
     }
