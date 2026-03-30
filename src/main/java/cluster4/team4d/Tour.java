@@ -32,6 +32,10 @@ public class Tour {
         return this.pickupOffered;
     }
 
+    public int getAvailableSpots() {
+        return this.availableSpots;
+    }
+
     public int calculatePrice(int groupSize) {
         return groupSize*this.pricePerPerson;
     }

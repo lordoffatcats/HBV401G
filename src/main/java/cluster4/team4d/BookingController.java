@@ -13,11 +13,11 @@ public class BookingController {
 
     public Booking createBooking(UUID tourId, String customerEmail, int groupSize, boolean pickupSelected, String hotelName) {
         if (tourId == null) return null;
-        if (customerEmail.isEmpty()) return null;
+        if (customerEmail == null || customerEmail.isEmpty()) return null;
         if (groupSize < 1) return null;
 
         Tour tour = tourDB.selectTour(tourId);
-        if (!tour.hasCapacityFor(groupSize)) {
+        if (tour == null || !tour.hasCapacityFor(groupSize)) {
             // TODO:
             return null;
         }

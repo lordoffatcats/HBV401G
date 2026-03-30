@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.UUID;
 
 /**
- * A mock object for the TourDB interface. It uses a simple
- * HashMap structure for database lookup.
+ * Simulates a storage failure by returning false from updateTour(...) to
+ * test controller's failure path when faced with database failures.
  */
-public class TourDBMock implements TourDB {
+public class TourDBFailureMock implements TourDB {
     private final HashMap<UUID, Tour> tours = new HashMap<>();
 
     @Override
@@ -22,6 +22,7 @@ public class TourDBMock implements TourDB {
     public Tour selectTour(UUID tourId) {
         // Used by the Controller to validate tour existence
         // and fetching the domain model object to update available spots.
+        // Implemented here so code gets to the update failure.
         return tours.get(tourId);
     }
 
@@ -35,10 +36,8 @@ public class TourDBMock implements TourDB {
 
     @Override
     public boolean updateTour(Tour tour) {
-        // Updates the tour in the HashMap database,
-        // implemented for the success case where the Controller
-        // reduces the available spots on the object and then saves to DB.
-        tours.put(tour.getTourId(), tour);
-        return true;
+        // The failure case, instantly returns false to
+        // simulate database failure.
+        return false;
     }
 }

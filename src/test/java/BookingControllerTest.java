@@ -4,20 +4,31 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * This is the fixture for BookingController.createBooking(...), which handles our business logic
+ * for when day tours get booked. In these tests we utilize JUnit parameterized tests to test our
+ * boundary and representative values with the same code. In here we test most of the success and
+ * failure cases, and also include a test for database failures in one path.
+ */
 public class BookingControllerTest {
     private TourDB tourDB;
     private BookingDB bookingDB;
     private BookingController bookingController;
-    private Tour testTour;
+
+    private final int pricePerPerson = 1000;
+    private final int bookableSpots = 10;
 
     @BeforeEach
     public void setup() {
+        // Fresh mocks and controller object created per test
         tourDB = new TourDBMock();
         bookingDB = new BookingDBMock();
         bookingController = new BookingController(tourDB, bookingDB);
@@ -25,116 +36,218 @@ public class BookingControllerTest {
 
     @AfterEach
     void tearDown() {
+        // Reset the test environment after each test
         tourDB = null;
         bookingDB = null;
         bookingController = null;
-        testTour = null;
     }
 
     @ParameterizedTest
     @CsvSource({
-            "1, true",
-            "3, true",
-            "5, true",
-            "-50, false",
-            "-1, false",
-            "0, false",
-            "6, false",
-            "50, false"
+            "1", // Lower boundary
+            "5", // Representative
+            "10", // Upper boundary
     })
-    public void testCreateBookingSeats(int seats, boolean isValid) {
-        // Tests creating a booking with various amounts of seats.
-        // [1-5] seats should return a valid Booking, and anything else should return null.
-        testTour = new Tour(
-                UUID.randomUUID(),
-                "Test Tour",
-                "Description",
-                1000,
-                "Location",
-                true,
-                5,
-                LocalDateTime.now());
-        tourDB.insertTour(testTour);
+    public void testCreateBookingReducesSpots(int spotsToBook) {
+        // Arrange
+        Tour tour = createTour(pricePerPerson, bookableSpots, true); // Create dummy tour
+        tourDB.insertTour(tour); // Insert into mock, used by Controller
+
+        // Act
+        // Execute createBooking on the Controller
         Booking booking = bookingController.createBooking(
-                testTour.getTourId(),
+                tour.getTourId(),
                 "test@test.com",
-                seats,
+                spotsToBook,
                 false,
-                null
-        );
-        if (isValid) {
-            assertNotNull(booking);
-        } else {
-            assertNull(booking);
-        }
+                null);
+
+        // Assert
+        assertNotNull(booking); // Booking should be returned
+        assertEquals(bookableSpots - spotsToBook, tour.getAvailableSpots()); // Seats should be reduced
+        assertEquals("Confirmed", booking.getStatus());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "-50", // Representative below lower bound
+            "-1", // Lower boundary value
+            "0", // Lower boundary value
+            "11", // Upper boundary value
+            "50" // Representative above upper bound
+    })
+    public void testCreateBookingDoesNotReduceSpots(int spotsToBook) {
+        // Arrange
+        Tour tour = createTour(pricePerPerson, bookableSpots, true);
+        tourDB.insertTour(tour);
+
+        // Act
+        // Execute createBooking on the Controller
+        Booking booking = bookingController.createBooking(
+                tour.getTourId(),
+                "test@test.com",
+                spotsToBook,
+                false,
+                null);
+
+        // Assert
+        assertNull(booking);
+        assertEquals(bookableSpots, tour.getAvailableSpots());
     }
 
     @Test
-    public void testCreateBookingNoAvailability() {
-        //Veit ekki alveg hvað var átt við hér
-        assertFalse(false);
-    }
+    public void testCreateBookingCalculatesTotalPrice() {
+        // Arrange
+        final int spotsToBook = 5;
+        Tour tour = createTour(pricePerPerson, bookableSpots, true); // Create dummy tour
+        tourDB.insertTour(tour); // Insert into mock, used by Controller
 
-    @ParameterizedTest
-    @CsvSource({
-        "1, 1000",
-        "3, 3000",
-        "5, 5000",
-    })
-    public void testBookingHasTotalPrice(int seats, int correctTotalPrice) {
-        // Tests whether total price calculation is correct.
-        testTour = new Tour(
-                UUID.randomUUID(),
-                "Test Tour",
-                "Description",
-                1000,
-                "Location",
-                true,
-                5,
-                LocalDateTime.now());
-        tourDB.insertTour(testTour);
+        // Act
+        // Execute createBooking on the Controller
         Booking booking = bookingController.createBooking(
-                testTour.getTourId(),
+                tour.getTourId(),
                 "test@test.com",
-                seats,
+                spotsToBook,
                 false,
-                null
-        );
-        assertEquals(booking.getTotalPrice(), correctTotalPrice);
+                null);
+
+        // Assert
+        assertNotNull(booking); // Booking should be returned
+        assertEquals(pricePerPerson*spotsToBook, booking.getTotalPrice()); // Price should be multiplicative
+    }
+
+    @Test
+    public void testCreateBookingWithHotelPickupAllowed() {
+        // Arrange
+        final int spotsToBook = 5;
+        final String hotelName = "Hotel Name";
+        Tour tour = createTour(pricePerPerson, bookableSpots, true); // Create dummy tour
+        tourDB.insertTour(tour); // Insert into mock, used by Controller
+
+        // Act
+        // Execute createBooking on the Controller
+        Booking booking = bookingController.createBooking(
+                tour.getTourId(),
+                "test@test.com",
+                spotsToBook,
+                true,
+                hotelName);
+
+        // Assert
+        assertNotNull(booking); // Booking should be returned
+        assertTrue(booking.getPickupSelected()); // Pickup should be reflected on booking
+        assertEquals(hotelName, booking.getHotelName()); // Hotel Name should be reflected on booking
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "true, true, true",
-            "false, true, false",
-            "true, false, true",
-            "false, false, true",
-    })
-    public void testBookingWithHotelPickup(boolean pickupOffered, boolean pickupSelected, boolean isValid) {
-        // Tests whether booking for tour is created for
-        // combinations of tour offering pickup and pickup selected.
-        // If no pickup is offered, but pickup is selected, createBooking should return null.
-        testTour = new Tour(
-                UUID.randomUUID(),
-                "Test Tour",
-                "Description",
-                1000,
-                "Location",
-                pickupOffered,
-                5,
-                LocalDateTime.now());
-        tourDB.insertTour(testTour);
+    @CsvSource({ "true", "false" }) // Test both binary cases
+    public void testCreateBookingHotelPickupDisabled(boolean pickupSelected) {
+        // Arrange
+        final int spotsToBook = 5;
+        final String hotelName = "Hotel Name";
+        Tour tour = createTour(pricePerPerson, bookableSpots, false); // Create dummy tour
+        tourDB.insertTour(tour); // Insert into mock, used by Controller
+
+        // Act
+        // Execute createBooking on the Controller
         Booking booking = bookingController.createBooking(
-                testTour.getTourId(),
+                tour.getTourId(),
+                "test@test.com",
+                spotsToBook,
+                pickupSelected,
+                hotelName);
+
+        // Assert
+        assertNotNull(booking); // Booking should be returned
+        assertFalse(booking.getPickupSelected()); // Pickup should not be allowed
+    }
+
+    @Test
+    public void testCreateBookingInvalidTourId() {
+        // Arrange
+
+        // Act
+        // Execute createBooking on the Controller
+        Booking booking = bookingController.createBooking(
+                null,
                 "test@test.com",
                 1,
-                pickupSelected,
-                "Test Hotel"
-        );
-        if (isValid) {
-            assertNotNull(booking);
-        } else {
-            assertNull(booking);
-        }
+                false,
+                null);
+
+        // Assert
+        assertNull(booking); // No booking should have been made
+    }
+
+    @Test
+    public void testCreateBookingTourNotFound() {
+        // Arrange
+        UUID tourId = UUID.randomUUID(); // Random UUID that is not present in DB mock
+
+        // Act
+        // Execute createBooking on the Controller
+        Booking booking = bookingController.createBooking(
+                tourId,
+                "test@test.com",
+                1,
+                false,
+                null);
+
+        // Assert
+        assertNull(booking); // No booking should have been made
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {""})
+    public void testCreateBookingInvalidEmail(String email) {
+        // Arrange
+        Tour tour = createTour(pricePerPerson, bookableSpots, true);
+        tourDB.insertTour(tour);
+
+        // Act
+        // Execute createBooking on the Controller
+        Booking booking = bookingController.createBooking(
+                tour.getTourId(),
+                email,
+                1,
+                false,
+                null);
+
+        // Assert
+        assertNull(booking); // No booking should have been made
+    }
+
+    @Test
+    public void testCreateBookingTourUpdateFails() {
+        // Arrange
+        TourDB tourDBMock = new TourDBFailureMock();
+        Tour tour = createTour(pricePerPerson, bookableSpots, true);
+        tourDBMock.insertTour(tour);
+        BookingController controller = new BookingController(tourDBMock, bookingDB);
+
+        // Act
+        // Execute createBooking on the Controller
+        Booking booking = controller.createBooking(
+                tour.getTourId(),
+                "test@test.com",
+                1,
+                false,
+                null);
+
+        // Assert
+        assertNull(booking); // No booking should have been made
+    }
+
+    private Tour createTour(int pricePerPerson, int spots, boolean pickupOffered) {
+        return new Tour(
+                UUID.randomUUID(),
+                "Test Tour",
+                "Description",
+                pricePerPerson,
+                "Location",
+                pickupOffered,
+                spots,
+                LocalDateTime.now());
     }
 }

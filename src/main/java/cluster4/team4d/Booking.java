@@ -43,6 +43,14 @@ public class Booking {
         return this.groupSize;
     }
 
+    public boolean getPickupSelected() {
+        return this.pickupSelected;
+    }
+
+    public String getHotelName() {
+        return this.hotelName;
+    }
+
     public void confirm() {
         this.status = "Confirmed";
     }
