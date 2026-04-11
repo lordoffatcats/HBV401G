@@ -29,8 +29,11 @@ public class BookingControllerTest {
     @BeforeEach
     public void setup() {
         // Fresh mocks and controller object created per test
-        tourDB = new TourDBMock();
-        bookingDB = new BookingDBMock();
+        //tourDB = new TourDBMock();
+        //bookingDB = new BookingDBMock();
+        Database.createdb("./grunnur.db");
+        tourDB = new TourDatabase("jdbc:sqlite:./grunnur.db");
+        bookingDB = new BookingDatabase("jdbc:sqlite:./grunnur.db");
         bookingController = new BookingController(tourDB, bookingDB);
     }
 
@@ -40,6 +43,7 @@ public class BookingControllerTest {
         tourDB = null;
         bookingDB = null;
         bookingController = null;
+        Database.deletedb("./grunnur.db");
     }
 
     @ParameterizedTest
@@ -62,9 +66,12 @@ public class BookingControllerTest {
                 false,
                 null);
 
+        // Fetch updated tour from database (the original tour object created above is not modified even though database is updated)
+        Tour updatedTour = tourDB.selectTour(tour.getTourId());
+
         // Assert
         assertNotNull(booking); // Booking should be returned
-        assertEquals(bookableSpots - spotsToBook, tour.getAvailableSpots()); // Seats should be reduced
+        assertEquals(bookableSpots - spotsToBook, updatedTour.getAvailableSpots()); // Seats should be reduced
         assertEquals("Confirmed", booking.getStatus());
     }
 
