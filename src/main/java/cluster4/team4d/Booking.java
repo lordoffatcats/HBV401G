@@ -23,6 +23,10 @@ public class Booking {
         this.hotelName = hotelName;
     }
 
+    public String getCustomerEmail() {
+        return customerEmail;
+    }
+
     public int getTotalPrice() {
         return totalPrice;
     }

@@ -28,6 +28,22 @@ public class Tour {
         return this.tourId;
     }
 
+    public String getTitle() {
+        return this.title;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public int getPricePerPerson() {
+        return this.pricePerPerson;
+    }
+
+    public String getLocation() {
+        return this.location;
+    }
+
     public boolean getPickupOffered() {
         return this.pickupOffered;
     }
@@ -35,6 +51,11 @@ public class Tour {
     public int getAvailableSpots() {
         return this.availableSpots;
     }
+
+    public LocalDateTime getDateTime() {
+        return this.dateTime;
+    }
+
 
     public int calculatePrice(int groupSize) {
         return groupSize*this.pricePerPerson;
@@ -53,4 +74,5 @@ public class Tour {
     public void freeSpots(int groupSize) {
         this.availableSpots += groupSize;
     }
+
 }
