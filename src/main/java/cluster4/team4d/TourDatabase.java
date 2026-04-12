@@ -55,14 +55,14 @@ public class TourDatabase implements TourDB {
         String sql = """
             SELECT tourId, title, description, pricePerPerson, location, pickupOffered, availableSpots, dateTime
             FROM tours
-            WHERE title MATCH ?
+            WHERE title LIKE ?
         """;
 
         List<Tour> tours = new ArrayList<>();
 
         try (Connection conn = this.db.connect()) {
             PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, keyword);
+            ps.setString(1, "%" + keyword + "%");
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
