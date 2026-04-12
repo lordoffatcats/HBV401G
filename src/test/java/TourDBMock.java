@@ -19,6 +19,12 @@ public class TourDBMock implements TourDB {
     }
 
     @Override
+    public Collection<Tour> searchTours(String keyword) {
+        // Not used by our test cases, but would be used for listing tours.
+        return tours.values();
+    }
+
+    @Override
     public Tour selectTour(UUID tourId) {
         // Used by the Controller to validate tour existence
         // and fetching the domain model object to update available spots.

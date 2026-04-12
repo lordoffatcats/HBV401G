@@ -5,6 +5,7 @@ import java.util.UUID;
 
 public interface TourDB {
     Collection<Tour> selectTours();
+    Collection<Tour> searchTours(String keyword);
     Tour selectTour(UUID tourId);
     boolean insertTour(Tour tour);
     boolean updateTour(Tour tour);

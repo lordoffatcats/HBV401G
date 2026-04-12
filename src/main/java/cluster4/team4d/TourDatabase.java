@@ -51,6 +51,41 @@ public class TourDatabase implements TourDB {
     }
 
     @Override
+    public Collection<Tour> searchTours(String keyword) {
+        String sql = """
+            SELECT tourId, title, description, pricePerPerson, location, pickupOffered, availableSpots, dateTime
+            FROM tours
+            WHERE title MATCH ?
+        """;
+
+        List<Tour> tours = new ArrayList<>();
+
+        try (Connection conn = this.db.connect()) {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, keyword);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Tour tour = new Tour(
+                        UUID.fromString(rs.getString("tourId")),
+                        rs.getString("title"),
+                        rs.getString("description"),
+                        rs.getInt("pricePerPerson"),
+                        rs.getString("location"),
+                        rs.getBoolean("pickupOffered"),
+                        rs.getInt("availableSpots"),
+                        LocalDateTime.parse(rs.getString("dateTime"))
+                );
+                tours.add(tour);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tours;
+    }
+
+    @Override
     public Tour selectTour(UUID tourId) {
         try (Connection conn = this.db.connect()) {
             String sql = """

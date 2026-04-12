@@ -19,7 +19,6 @@ public class TourController {
     }
 
     public Collection<Tour> findTours(String keyword) {
-        // TODO: Implement
-        return null;
+        return tourDB.searchTours(keyword);
     }
 }
