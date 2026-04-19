@@ -5,17 +5,17 @@ import java.util.UUID;
 public class Booking {
     private final UUID bookingId;
     private final UUID tourId;
-    private final String customerEmail;
+    private final String email;
     private String status;
     private final int groupSize;
     private final int totalPrice;
     private final boolean pickupSelected;
     private final String hotelName;
 
-    public Booking(UUID bookingId, UUID tourId, String customerEmail, String status, int groupSize, int totalPrice, boolean pickupSelected, String hotelName) {
+    public Booking(UUID bookingId, UUID tourId, String email, String status, int groupSize, int totalPrice, boolean pickupSelected, String hotelName) {
         this.bookingId = bookingId;
         this.tourId = tourId;
-        this.customerEmail = customerEmail;
+        this.email = email;
         this.status = status;
         this.groupSize = groupSize;
         this.totalPrice = totalPrice;
@@ -23,8 +23,8 @@ public class Booking {
         this.hotelName = hotelName;
     }
 
-    public String getCustomerEmail() {
-        return customerEmail;
+    public String getEmail() {
+        return email;
     }
 
     public int getTotalPrice() {

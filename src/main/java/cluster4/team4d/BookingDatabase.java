@@ -16,14 +16,14 @@ public class BookingDatabase implements BookingDB{
     public boolean insertBooking(Booking booking) {
         try (Connection conn = this.db.connect()) {
             String sql = """
-                INSERT INTO bookings (bookingId, tourId, customerEmail, status, groupSize, totalPrice, pickupSelected, hotelName)
+                INSERT INTO bookings (bookingId, tourId, email, status, groupSize, totalPrice, pickupSelected, hotelName)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """;
             PreparedStatement ps = conn.prepareStatement(sql);
 
             ps.setString(1, booking.getBookingId().toString());
             ps.setString(2, booking.getTourId().toString());
-            ps.setString(3, booking.getCustomerEmail());
+            ps.setString(3, booking.getEmail());
             ps.setString(4, booking.getStatus());
             ps.setInt(5, booking.getGroupSize());
             ps.setInt(6, booking.getTotalPrice());
@@ -43,7 +43,7 @@ public class BookingDatabase implements BookingDB{
     public Booking selectBooking(UUID bookingId) {
         try (Connection conn = this.db.connect()) {
             String sql = """
-                SELECT bookingId, tourId, customerEmail, status, groupSize, totalPrice, pickupSelected, hotelName
+                SELECT bookingId, tourId, email, status, groupSize, totalPrice, pickupSelected, hotelName
                 FROM bookings
                 WHERE bookingId = ?;
             """;
@@ -55,7 +55,7 @@ public class BookingDatabase implements BookingDB{
                 return new Booking(
                         UUID.fromString(rs.getString("bookingId")),
                         UUID.fromString(rs.getString("tourId")),
-                        rs.getString("customerEmail"),
+                        rs.getString("email"),
                         rs.getString("status"),
                         rs.getInt("groupSize"),
                         rs.getInt("totalPrice"),
@@ -75,7 +75,7 @@ public class BookingDatabase implements BookingDB{
         String sql = """
             UPDATE bookings
             SET tourId = ?,
-                customerEmail = ?,
+                email = ?,
                 status = ?,
                 groupSize = ?,
                 totalPrice = ?,
@@ -88,7 +88,7 @@ public class BookingDatabase implements BookingDB{
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, booking.getTourId().toString());
-            ps.setString(2, booking.getCustomerEmail());
+            ps.setString(2, booking.getEmail());
             ps.setString(3, booking.getStatus());
             ps.setInt(4, booking.getGroupSize());
             ps.setInt(5, booking.getTotalPrice());

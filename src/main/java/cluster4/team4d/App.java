@@ -160,6 +160,7 @@ public class App {
 
         System.out.println();
         System.out.println("Booking | " + booking.getBookingId());
+        System.out.println("Email: " + booking.getEmail());
         System.out.println("Status: " + booking.getStatus());
         System.out.println("Group size: " + booking.getGroupSize());
         System.out.println("Price: " + booking.getTotalPrice());

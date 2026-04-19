@@ -11,9 +11,9 @@ public class BookingController {
         this.bookingDB = bookingDB;
     }
 
-    public Booking createBooking(UUID tourId, String customerEmail, int groupSize, boolean pickupSelected, String hotelName) {
+    public Booking createBooking(UUID tourId, String email, int groupSize, boolean pickupSelected, String hotelName) {
         if (tourId == null) return null;
-        if (customerEmail == null || customerEmail.isEmpty()) return null;
+        if (email == null || email.isEmpty()) return null;
         if (groupSize < 1) return null;
 
         Tour tour = tourDB.selectTour(tourId);
@@ -33,7 +33,7 @@ public class BookingController {
         int totalPrice = tour.calculatePrice(groupSize);
         boolean pickup = pickupSelected && tour.getPickupOffered();
 
-        Booking booking = new Booking(bookingId, tourId, customerEmail, "Pending", groupSize, totalPrice, pickup, hotelName);
+        Booking booking = new Booking(bookingId, tourId, email, "Pending", groupSize, totalPrice, pickup, hotelName);
         booking.confirm();
         boolean isBookingInserted = bookingDB.insertBooking(booking);
         return isBookingInserted ? booking : null;

@@ -54,7 +54,7 @@ public class Database {
                 CREATE TABLE bookings (
                     bookingId TEXT PRIMARY KEY, -- text for UUID
                     tourId TEXT NOT NULL,
-                    customerEmail TEXT NOT NULL,
+                    email TEXT NOT NULL,
                     status TEXT CHECK (status IN ('Pending', 'Confirmed', 'Cancelled')),
                     groupSize INTEGER  NOT NULL,
                     totalPrice INTEGER  NOT NULL,

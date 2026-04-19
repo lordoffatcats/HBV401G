@@ -20,7 +20,7 @@ public class TourDBMock implements TourDB {
 
     @Override
     public Collection<Tour> searchTours(String keyword) {
-        // Not used by our test cases, but would be used for listing tours.
+        // Not used by our test cases, but would be used for searching tours.
         return tours.values();
     }
 
