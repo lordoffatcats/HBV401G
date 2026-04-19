@@ -19,7 +19,7 @@ public class App {
     private final static Scanner scanner = new Scanner(System.in);
 
     static void main() {
-        Database.createdb("./grunnur.db");
+        Database.createDb("./grunnur.db");
         System.out.println("Day tour booking system (test app)");
         System.out.println();
 

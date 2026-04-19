@@ -2,6 +2,10 @@ package cluster4.team4d;
 
 import java.util.UUID;
 
+/**
+ * The booking model class that contains and keeps track of
+ * domain information regarding bookings.
+ */
 public class Booking {
     private final UUID bookingId;
     private final UUID tourId;
@@ -55,10 +59,16 @@ public class Booking {
         return this.hotelName;
     }
 
+    /**
+     * Sets the booking status as "Confirmed".
+     */
     public void confirm() {
         this.status = "Confirmed";
     }
 
+    /**
+     * Sets the booking status as "Cancelled".
+     */
     public void cancel() {
         this.status = "Cancelled";
     }

@@ -6,8 +6,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-/*
- Utility klasi fyrir tengingar við gagnagrunn með JDBC.
+/**
+ * A utility class to interact with SQLite DB via JDBC.
  */
 public class Database {
     String databaseUrl;
@@ -17,9 +17,9 @@ public class Database {
     }
 
     /**
-     * Býr til nýja tengingu við gagnagrunninn.
-     * @return JDBC Connection við gagnagrunninn.
-     * @throws SQLException
+     * Create a new connection to the database.
+     * @return JDBC connection to the database.
+     * @throws SQLException If the connection process fails.
      */
     Connection connect() throws SQLException {
         Connection conn = DriverManager.getConnection(this.databaseUrl);
@@ -28,10 +28,10 @@ public class Database {
     }
 
     /**
-     * Býr tíl nýtt sqlite3 database
-     * @param filename path á grunninum.
+     * Creates a new SQLite database.
+     * @param filename path to the database on disk.
      */
-    public static void createdb(String filename) {
+    public static void createDb(String filename) {
         Database db = new Database("jdbc:sqlite:" + filename);
 
         try (Connection conn = db.connect();
@@ -72,10 +72,10 @@ public class Database {
     }
 
     /**
-     * Eyðir sqlite gagnagrunn
-     * @param filename path á grunninum.
+     * Deletes a provided SQLite database.
+     * @param filename path to the database on disk.
      */
-    public static void deletedb(String filename) {
+    public static void deleteDb(String filename) {
         File dbFile = new File(filename);
         if (dbFile.delete()) {
             System.out.println("Database deleted successfully.");

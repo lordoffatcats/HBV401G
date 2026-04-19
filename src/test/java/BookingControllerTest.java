@@ -31,12 +31,6 @@ public class BookingControllerTest {
         // Fresh mocks and controller object created per test
         tourDB = new TourDBMock();
         bookingDB = new BookingDBMock();
-
-        // skítamix til að testa sqlite database
-        //Database.createdb("./grunnur.db");
-        //tourDB = new TourDatabase("jdbc:sqlite:./grunnur.db");
-        //bookingDB = new BookingDatabase("jdbc:sqlite:./grunnur.db");
-
         bookingController = new BookingController(tourDB, bookingDB);
     }
 

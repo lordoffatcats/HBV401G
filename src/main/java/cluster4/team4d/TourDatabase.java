@@ -11,12 +11,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 
+/**
+ * TourDatabase keeps track of the SQLite implementation
+ * of fetching, updating and storing Tour models.
+ */
 public class TourDatabase implements TourDB {
     Database db;
     public TourDatabase(String databaseUrl) {
         this.db = new Database(databaseUrl);
     }
 
+    /**
+     * Get all Tours from the database.
+     * @return A collection of all tours in the database.
+     */
     @Override
     public Collection<Tour> selectTours() {
         String sql = """
@@ -50,6 +58,11 @@ public class TourDatabase implements TourDB {
         return tours;
     }
 
+    /**
+     * Get all Tours from database that match a specified keyword.
+     * @param keyword Keyword to search by.
+     * @return A collection of tours that match the specified keyword.
+     */
     @Override
     public Collection<Tour> searchTours(String keyword) {
         String sql = """
@@ -85,6 +98,11 @@ public class TourDatabase implements TourDB {
         return tours;
     }
 
+    /**
+     * Get a tour by its UUID.
+     * @param tourId The UUID of the tour to fetch.
+     * @return Domain model of the Tour if successful, null otherwise.
+     */
     @Override
     public Tour selectTour(UUID tourId) {
         try (Connection conn = this.db.connect()) {
@@ -116,6 +134,11 @@ public class TourDatabase implements TourDB {
         }
     }
 
+    /**
+     * Insert a Tour using its domain model.
+     * @param tour The Tour to insert.
+     * @return A boolean value indicating success or failure.
+     */
     @Override
     public boolean insertTour(Tour tour) {
         try (Connection conn = this.db.connect()) {
@@ -142,6 +165,11 @@ public class TourDatabase implements TourDB {
         }
     }
 
+    /**
+     * Update a given tour by its domain model.
+     * @param tour The tour to update.
+     * @return A boolean value indicating success or failure.
+     */
     @Override
     public boolean updateTour(Tour tour) {
         String sql = """

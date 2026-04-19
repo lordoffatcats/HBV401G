@@ -3,6 +3,10 @@ package cluster4.team4d;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * The tour model class that contains and keeps track of
+ * domain information regarding tours.
+ */
 public class Tour {
     private final UUID tourId;
     private final String title;
@@ -56,21 +60,38 @@ public class Tour {
         return this.dateTime;
     }
 
-
+    /**
+     * Computes the total price for a provided group size.
+     * @param groupSize The group size.
+     * @return The total price for the group size.
+     */
     public int calculatePrice(int groupSize) {
         return groupSize*this.pricePerPerson;
     }
 
+    /**
+     * Checks if the tour has capacity for a given group size.
+     * @param groupSize The group size.
+     * @return A boolean indicating if spots are available, or not.
+     */
     public boolean hasCapacityFor(int groupSize) {
         return groupSize <= this.availableSpots;
     }
 
+    /**
+     * Reserves spots on the tour if there is capacity.
+     * @param groupSize The number of spots to reserve.
+     */
     public void reserveSpots(int groupSize) {
         if (hasCapacityFor(groupSize)) {
             this.availableSpots -= groupSize;
         }
     }
 
+    /**
+     * Releases the specified number of reserved seats.
+     * @param groupSize The number of seats to release.
+     */
     public void freeSpots(int groupSize) {
         this.availableSpots += groupSize;
     }

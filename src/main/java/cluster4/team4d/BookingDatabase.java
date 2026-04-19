@@ -6,12 +6,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
-public class BookingDatabase implements BookingDB{
+/**
+ * BookingDatabase keeps track of the SQLite implementation
+ * of fetching, updating and storing Booking models.
+ */
+public class BookingDatabase implements BookingDB {
     Database db;
     public BookingDatabase(String databaseUrl) {
         this.db = new Database(databaseUrl);
     }
 
+    /**
+     * Insert a Booking domain model into the database.
+     * @param booking The Booking domain model to insert.
+     * @return A boolean value indicating success or failure.
+     */
     @Override
     public boolean insertBooking(Booking booking) {
         try (Connection conn = this.db.connect()) {
@@ -39,6 +48,11 @@ public class BookingDatabase implements BookingDB{
         }
     }
 
+    /**
+     * Get an existing booking from the database.
+     * @param bookingId The UUID of the booking to fetch.
+     * @return The Booking model if successful, null otherwise.
+     */
     @Override
     public Booking selectBooking(UUID bookingId) {
         try (Connection conn = this.db.connect()) {
@@ -70,6 +84,11 @@ public class BookingDatabase implements BookingDB{
         }
     }
 
+    /**
+     * Updates an existing booking in the database.
+     * @param booking The Booking model to update.
+     * @return A boolean value indicating success or failure.
+     */
     @Override
     public boolean updateBooking(Booking booking) {
         String sql = """
